@@ -6,6 +6,7 @@
 #include "hittable.h"
 #include "material.h"
 
+
 class camera {
   public:
     double aspect_ratio = 1.0;  // Ratio of image width over height
@@ -26,6 +27,9 @@ class camera {
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
+        vector<color> image(image_height * image_width);
+
+        #pragma omp parallel for schedule(dynamic)
         for (int j = 0; j < image_height; j++) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
@@ -34,9 +38,13 @@ class camera {
                     ray r = get_ray(i, j);
                     pixel_color += ray_color(r, max_depth, world);
                 }
-                write_color(std::cout, pixel_samples_scale * pixel_color);
+
+                image[j * image_width + i] = pixel_samples_scale * pixel_color;
             }
         }
+
+        for (int j = 0; j < image_height * image_width; j++)
+            write_color(std::cout, image[j]);
 
         std::clog << "\rDone.                 \n";
     }
