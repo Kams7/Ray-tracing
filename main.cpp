@@ -1,8 +1,9 @@
 #include<bits/stdc++.h>
+#include <chrono>
 
 using namespace std;
 
-#include "rt.h"
+#include "utils.h"
 
 #include "camera.h"
 #include "hittable.h"
@@ -16,6 +17,7 @@ using namespace std;
 
 int main() {
     double t1 = omp_get_wtime();
+    // auto start = std::chrono::high_resolution_clock::now();
 
     hittable_list world;
 
@@ -23,10 +25,10 @@ int main() {
     world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
 // #pragma omp parallel for collapse(2)
-    for (int a = -11; a < 11; a+=5) {
-        for (int b = -11; b < 11; b+=5) {
+    for (int a = -11; a < 11; a+=3) {
+        for (int b = -11; b < 11; b+=3) {
             auto choose_mat = random_double();
-            point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
+            point3 center(a + 1.9*random_double(), 0.2, b + 1.9*random_double());
 
             if ((center - point3(4, 0.2, 0)).length() > 0.9) {
                 shared_ptr<material> sphere_material;
@@ -79,4 +81,8 @@ int main() {
 
     double t2 = omp_get_wtime();
     clog<<t2-t1<<'\n';
+
+    // auto end = std::chrono::high_resolution_clock::now();
+    // std::chrono::duration<double> duration = end - start;
+    // std::clog << "Time taken: " << duration.count() << " seconds\n";
 }

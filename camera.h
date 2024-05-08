@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "rt.h"
+#include "utils.h"
 
 #include "hittable.h"
 #include "material.h"
@@ -29,10 +29,10 @@ class camera {
 
         vector<color> image(image_height * image_width);
 
-        #pragma omp parallel for schedule(dynamic)
+        #pragma omp parallel for collapse(2) num_threads(4) schedule(dynamic)
         for (int j = 0; j < image_height; j++) {
-            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
+                if (i==0) std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
                 color pixel_color(0,0,0);
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     ray r = get_ray(i, j);
